@@ -67,10 +67,22 @@ async function run() {
 
         });
 
+
         app.get('/users', verifyFBToken, async (req, res) => {
             const result = await usersCollection.find().toArray();
             res.status(200).send(result);
         });
+
+
+
+        app.post('/requests', verifyFBToken, async (req, res) => {
+            const requestInfo = req.body;
+            requestInfo.createdAt = new Date();
+            const result = await requestsCollection.insertOne(requestInfo);
+            res.send(result);
+        });
+
+
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
