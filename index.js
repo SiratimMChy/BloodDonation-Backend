@@ -37,7 +37,7 @@ const verifyFBToken = async (req, res, next) => {
 };
 
 
-const uri = "mongodb+srv://BloodDonation:FYwt4tKuBeGsB0NH@cluster0.ybtdeyi.mongodb.net/?appName=Cluster0";
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ybtdeyi.mongodb.net/?appName=Cluster0`;
 
 
 const client = new MongoClient(uri, {
@@ -51,7 +51,7 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
 
-        await client.connect();
+        //await client.connect();
 
         const database = client.db('bloodDonationDB');
         const usersCollection = database.collection('users');
