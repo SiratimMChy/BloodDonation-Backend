@@ -100,6 +100,20 @@ async function run() {
             res.send({ totalRequests, requests: result });
         });
 
+         app.get('/my-recent-requests', verifyFBToken, async (req, res) => {
+            try {
+                const email = req.decodedEmail;
+                const result = await requestsCollection
+                    .find({ requesterEmail: email })
+                    .sort({ createdAt: -1 })
+                    .limit(3)
+                    .toArray();
+                res.send(result);
+            } catch (error) {
+                res.status(500).send({ error: error.message });
+            }
+        });
+
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
 
