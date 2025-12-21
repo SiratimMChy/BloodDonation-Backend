@@ -82,7 +82,23 @@ async function run() {
             res.send(result);
         });
 
+ app.get('/requests', verifyFBToken, async (req, res) => {
+            const size = parseInt(req.query.size);
+            const page = parseInt(req.query.page);
+            const status = req.query.status;
+            const query = {};
+            if (status && status !== 'all') {
+                query.donation_status = status;
+            }
 
+            const result = await requestsCollection
+                .find(query)
+                .limit(size)
+                .skip(size * page)
+                .toArray();
+            const totalRequests = await requestsCollection.countDocuments(query);
+            res.send({ totalRequests, requests: result });
+        });
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
