@@ -113,7 +113,7 @@ async function run() {
                 res.status(500).send({ error: error.message });
             }
         });
-        
+
         app.get('/users/role/:email', async (req, res) => {
             const email = req.params.email;
             const query = { email: email };
@@ -139,6 +139,17 @@ async function run() {
             res.send({ totalRequests, requests: result });
         });
 
+ app.patch('/update/user/status', verifyFBToken, async (req, res) => {
+            const { email, status } = req.query;
+            const query = { email: email };
+            const updateStatus = {
+                $set: {
+                    status: status
+                },
+            };
+            const result = await usersCollection.updateOne(query, updateStatus);
+            res.send(result);
+        });
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
