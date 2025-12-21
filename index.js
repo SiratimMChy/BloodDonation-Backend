@@ -82,7 +82,7 @@ async function run() {
             res.send(result);
         });
 
- app.get('/requests', verifyFBToken, async (req, res) => {
+        app.get('/requests', verifyFBToken, async (req, res) => {
             const size = parseInt(req.query.size);
             const page = parseInt(req.query.page);
             const status = req.query.status;
@@ -100,7 +100,7 @@ async function run() {
             res.send({ totalRequests, requests: result });
         });
 
-         app.get('/my-recent-requests', verifyFBToken, async (req, res) => {
+        app.get('/my-recent-requests', verifyFBToken, async (req, res) => {
             try {
                 const email = req.decodedEmail;
                 const result = await requestsCollection
@@ -113,7 +113,12 @@ async function run() {
                 res.status(500).send({ error: error.message });
             }
         });
-
+        app.get('/users/role/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email };
+            const result = await usersCollection.findOne(query);
+            res.send(result);
+        });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
 
