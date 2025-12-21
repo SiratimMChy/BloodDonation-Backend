@@ -163,6 +163,24 @@ app.patch('/update/user/role', verifyFBToken, async (req, res) => {
             res.send(result);
         });
 
+ app.patch('/users/update/profile', verifyFBToken, async (req, res) => {
+            const email = req.decodedEmail;
+            const query = { email: email };
+            const { name, imageUrl, district, upazila, bloodGroup } = req.body;
+
+            const updateProfile = {
+                $set: {
+                    name: name,
+                    imageUrl: imageUrl,
+                    district: district,
+                    upazila: upazila,
+                    bloodGroup: bloodGroup,
+                    updatedAt: new Date()
+                }
+            };
+            const result = await usersCollection.updateOne(query, updateProfile);
+            res.send(result);
+        });
 
 
 
