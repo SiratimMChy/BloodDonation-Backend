@@ -52,6 +52,7 @@ async function run() {
     try {
 
         await client.connect();
+
         const database = client.db('bloodDonationDB');
         const usersCollection = database.collection('users');
         const requestsCollection = database.collection('requests');
@@ -100,6 +101,7 @@ async function run() {
             res.send({ totalRequests, requests: result });
         });
 
+
         app.get('/my-recent-requests', verifyFBToken, async (req, res) => {
             try {
                 const email = req.decodedEmail;
@@ -139,7 +141,9 @@ async function run() {
             res.send({ totalRequests, requests: result });
         });
 
- app.patch('/update/user/status', verifyFBToken, async (req, res) => {
+
+
+        app.patch('/update/user/status', verifyFBToken, async (req, res) => {
             const { email, status } = req.query;
             const query = { email: email };
             const updateStatus = {
@@ -151,7 +155,7 @@ async function run() {
             res.send(result);
         });
 
-app.patch('/update/user/role', verifyFBToken, async (req, res) => {
+        app.patch('/update/user/role', verifyFBToken, async (req, res) => {
             const { email, role } = req.query;
             const query = { email: email };
             const updateRole = {
@@ -163,7 +167,7 @@ app.patch('/update/user/role', verifyFBToken, async (req, res) => {
             res.send(result);
         });
 
- app.patch('/users/update/profile', verifyFBToken, async (req, res) => {
+        app.patch('/users/update/profile', verifyFBToken, async (req, res) => {
             const email = req.decodedEmail;
             const query = { email: email };
             const { name, imageUrl, district, upazila, bloodGroup } = req.body;
@@ -181,21 +185,6 @@ app.patch('/update/user/role', verifyFBToken, async (req, res) => {
             const result = await usersCollection.updateOne(query, updateProfile);
             res.send(result);
         });
-
-
-    app.patch('/update/user/role', verifyFBToken, async (req, res) => {
-            const { email, role } = req.query;
-            const query = { email: email };
-            const updateRole = {
-                $set: {
-                    role: role
-                },
-            };
-            const result = await usersCollection.updateOne(query, updateRole);
-            res.send(result);
-        });
-
-       
 
 
         app.post('/create-payment-checkout', async (req, res) => {
@@ -282,6 +271,80 @@ app.patch('/update/user/role', verifyFBToken, async (req, res) => {
                 });
             }
         });
+
+        app.get('/requests/:id', verifyFBToken, async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await requestsCollection.findOne(query);
+
+            if (!result) {
+                return res.status(404).send({ message: 'Request not found' });
+            }
+
+            res.send(result);
+        });
+
+
+        app.put('/requests/:id', verifyFBToken, async (req, res) => {
+            const data = req.body;
+            const { id } = req.params;
+            const query = { _id: new ObjectId(id) };
+            const updatedRequest = { $set: data };
+            const result = await requestsCollection.updateOne(query, updatedRequest);
+            res.send(result);
+        });
+
+
+        app.delete('/delete-request/:id', async (req, res) => {
+            try {
+                const { id } = req.params;
+                const query = { _id: new ObjectId(id) };
+                const result = await requestsCollection.deleteOne(query);
+                res.send(result);
+            } catch (error) {
+                res.status(500).send({ error: error.message });
+            }
+        });
+
+        app.get('/public-requests', async (req, res) => {
+            const size = parseInt(req.query.size);
+            const page = parseInt(req.query.page);
+            const status = req.query.status;
+            const query = {};
+            if (status && status !== 'all') {
+                query.donation_status = status;
+            }
+
+            const result = await requestsCollection
+                .find(query)
+                .limit(size)
+                .skip(size * page)
+                .toArray();
+            const totalRequests = await requestsCollection.countDocuments(query);
+            res.send({ totalRequests, requests: result });
+        });
+
+
+        app.get('/search-request', async (req, res) => {
+            const { bloodGroup, district, upazila } = req.query;
+
+            const query = {};
+            if (!query) {
+                return;
+            }
+            if (bloodGroup) {
+                query.bloodGroup = bloodGroup;
+            }
+            if (district) {
+                query.recipientDistrict = district;
+            }
+            if (upazila) {
+                query.recipientUpazila = upazila;
+            }
+            const result = await requestsCollection.find(query).toArray();
+            res.send(result)
+
+        })
 
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
