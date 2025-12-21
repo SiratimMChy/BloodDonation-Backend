@@ -151,6 +151,23 @@ async function run() {
             res.send(result);
         });
 
+app.patch('/update/user/role', verifyFBToken, async (req, res) => {
+            const { email, role } = req.query;
+            const query = { email: email };
+            const updateRole = {
+                $set: {
+                    role: role
+                },
+            };
+            const result = await usersCollection.updateOne(query, updateRole);
+            res.send(result);
+        });
+
+
+
+
+
+
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
 
