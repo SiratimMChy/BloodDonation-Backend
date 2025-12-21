@@ -113,12 +113,33 @@ async function run() {
                 res.status(500).send({ error: error.message });
             }
         });
+        
         app.get('/users/role/:email', async (req, res) => {
             const email = req.params.email;
             const query = { email: email };
             const result = await usersCollection.findOne(query);
             res.send(result);
         });
+
+        app.get('/myrequests', verifyFBToken, async (req, res) => {
+            const email = req.decodedEmail;
+            const size = parseInt(req.query.size);
+            const page = parseInt(req.query.page);
+            const query = { requesterEmail: email };
+            const status = req.query.status;
+            if (status && status !== 'all') {
+                query.donation_status = status;
+            }
+            const result = await requestsCollection
+                .find(query)
+                .limit(size)
+                .skip(size * page)
+                .toArray();
+            const totalRequests = await requestsCollection.countDocuments(query);
+            res.send({ totalRequests, requests: result });
+        });
+
+
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
 
