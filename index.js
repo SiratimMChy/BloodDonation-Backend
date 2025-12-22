@@ -61,8 +61,8 @@ async function run() {
         app.post('/users', async (req, res) => {
             const userInfo = req.body;
             userInfo.createdAt = new Date();
-            userInfo.role = 'Donor';
-            userInfo.status = 'Active';
+            userInfo.role = 'donor';
+            userInfo.status = 'active';
             const result = await usersCollection.insertOne(userInfo);
             res.send(result);
 
