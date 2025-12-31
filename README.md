@@ -4,7 +4,7 @@
 Hemovia is a **full-stack MERN application** designed to streamline blood donation processes by connecting **donors, volunteers, and administrators** on a unified platform. It allows donor registration, blood donation request creation and tracking, and donor search by blood group, district, and upazila for faster, more efficient responses during emergencies. The platform also includes an **admin dashboard** with role-based access control and a **fundraising module** integrated with Stripe for secure and transparent donations.
 
 ## 🌐 Live Project
-[Client-side Live Demo](https://blooddonation-f6367.web.app)
+[www.hemovia.com](https://blooddonation-f6367.web.app)
 
 ## 🛠 Technologies Used
 - **Frontend:** React.js, Tailwind CSS  
