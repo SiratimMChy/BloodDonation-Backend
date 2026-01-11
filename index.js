@@ -324,6 +324,30 @@ async function run() {
             res.send({ totalRequests, requests: result });
         });
 
+        app.get('/public-stats', async (req, res) => {
+            try {
+                const totalDonors = await usersCollection.countDocuments({ role: 'donor' });
+                const allRequests = await requestsCollection.countDocuments();
+                const doneRequests = await requestsCollection.countDocuments({
+                    donation_status: 'done'
+                });
+                const totalRequests = await requestsCollection.countDocuments({
+                    donation_status: { $ne: 'done' }
+                });
+                const successRate = allRequests > 0
+                    ? Math.round((doneRequests / allRequests) * 100)
+                    : 0;
+                const bloodStats = await requestsCollection.aggregate([
+                    { $match: { donation_status: { $ne: 'done' } } },
+                    { $group: { _id: '$bloodGroup', count: { $sum: 1 } } }
+                ]).toArray();
+                const bloodTypeCounts = {};
+                bloodStats.forEach(item => bloodTypeCounts[item._id] = item.count);
+                res.send({ totalDonors, totalRequests, successRate, bloodTypeCounts });
+            } catch (error) {
+                res.status(500).send({ message: 'Failed to load stats' });
+            }
+        });
 
         app.get('/search-request', async (req, res) => {
             const { bloodGroup, district, upazila } = req.query;
@@ -345,6 +369,38 @@ async function run() {
             res.send(result)
 
         })
+
+        app.get('/request-message-stats', async (req, res) => {
+            try {
+
+                const emergencyCases = await requestsCollection.countDocuments({
+                    requestMessage: {
+                        $regex: /(emergency|urgent|critical|heart|delivery|accident|life[-\s]?threat|cardiac|myocardial|pregnancy|childbirth)/i
+                    }
+                });
+
+                // Surgeries Enabled (includes surgery, operation, transfusion, procedure, hospitalized, c-section)
+                const surgeriesEnabled = await requestsCollection.countDocuments({
+                    requestMessage: {
+                        $regex: /(surgery|operation|transfusion|procedure|hospitalized|cesarean|c-section)/i
+                    }
+                });
+
+                // Families Helped (all done donations)
+                const familiesHelped = await requestsCollection.countDocuments({
+                    donation_status: 'done'
+                });
+
+                res.send({
+                    emergencyCases,
+                    surgeriesEnabled,
+                    familiesHelped
+                });
+            } catch (error) {
+                console.error('Stats fetch error:', error);
+                res.status(500).send({ message: 'Failed to load request message stats' });
+            }
+        });
 
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
