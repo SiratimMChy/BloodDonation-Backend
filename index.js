@@ -69,9 +69,30 @@ async function run() {
         });
 
 
+
+
         app.get('/users', verifyFBToken, async (req, res) => {
-            const result = await usersCollection.find().toArray();
-            res.status(200).send(result);
+            try {
+                const size = parseInt(req.query.size) || 10;
+                const page = parseInt(req.query.page) || 0;
+
+                const result = await usersCollection
+                    .find()
+                    .sort({ createdAt: -1 })
+                    .limit(size)
+                    .skip(size * page)
+                    .toArray();
+
+                const totalUsers = await usersCollection.countDocuments();
+
+                res.status(200).send({ totalUsers, users: result });
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                res.status(500).send({
+                    success: false,
+                    error: 'Failed to fetch users'
+                });
+            }
         });
 
 
@@ -379,14 +400,13 @@ async function run() {
                     }
                 });
 
-                // Surgeries Enabled (includes surgery, operation, transfusion, procedure, hospitalized, c-section)
                 const surgeriesEnabled = await requestsCollection.countDocuments({
                     requestMessage: {
                         $regex: /(surgery|operation|transfusion|procedure|hospitalized|cesarean|c-section)/i
                     }
                 });
 
-                // Families Helped (all done donations)
+
                 const familiesHelped = await requestsCollection.countDocuments({
                     donation_status: 'done'
                 });
@@ -401,6 +421,49 @@ async function run() {
                 res.status(500).send({ message: 'Failed to load request message stats' });
             }
         });
+
+
+
+        // Update your backend endpoint - remove verifyFBToken for demo users
+        app.get('/demo-users', async (req, res) => {
+            try {
+                const demoEmails = ['donor@hemovia.com', 'admin@hemovia.com'];
+                const demoUsers = await usersCollection.find({
+                    email: { $in: demoEmails }
+                }).toArray();
+
+                if (!demoUsers || demoUsers.length === 0) {
+                    return res.status(404).json({
+                        message: 'Demo users not found',
+                        users: []
+                    });
+                }
+
+                const demoUsersData = demoUsers.map(user => ({
+                    _id: user._id,
+                    email: user.email,
+                    name: user.name,
+                    role: user.role,
+                    bloodGroup: user.bloodGroup,
+                    district: user.district,
+                    upazila: user.upazila,
+                    imageUrl: user.imageUrl,
+                    status: user.status
+                }));
+
+                res.status(200).json({
+                    success: true,
+                    users: demoUsersData
+                });
+            } catch (error) {
+                console.error('Error fetching demo users:', error);
+                res.status(500).json({
+                    success: false,
+                    error: 'Failed to fetch demo users'
+                });
+            }
+        });
+
 
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
