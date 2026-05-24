@@ -217,11 +217,22 @@ DB_PASS=your_db_password
 
 ## 📁 Project File Structure
 
-The backend repository maintains a flat, efficient layout optimized for serverless performance on Vercel:
+The backend follows a clean **modular architecture** with dedicated directories for database configuration, authentication middleware, and domain-grouped route handlers:
 
-*   [index.js](file:///c:/Projects/Blood%20Donation%20-%20Backend/index.js): Main application entry point containing database connections, middleware definitions, route declarations, and business logic.
-*   [vercel.json](file:///c:/Projects/Blood%20Donation%20-%20Backend/vercel.json): Vercel platform configurations specifying Node.js runtime bindings (`@vercel/node`) and API routing rules.
-*   [package.json](file:///c:/Projects/Blood%20Donation%20-%20Backend/package.json): Defines dependencies, project metadata, and entry commands.
+```
+hemovia-backend/
+├── index.js                  # Entry point — registers middleware, mounts routes, starts server
+├── config/
+│   └── db.js                 # MongoDB client, connection, and exported collection references
+├── middleware/
+│   └── verifyFBToken.js      # Firebase Admin SDK initialization & JWT verification middleware
+├── routes/
+│   ├── userRoutes.js         # User registration, profile, role & status management endpoints
+│   ├── requestRoutes.js      # Blood donation request CRUD, search, stats & public endpoints
+│   └── paymentRoutes.js      # Stripe checkout session creation & payment verification endpoints
+├── vercel.json               # Vercel serverless deployment configuration
+└── package.json              # Dependencies, scripts, and project metadata
+```
 
 ---
 
