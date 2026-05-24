@@ -77,42 +77,29 @@ The Express gateway exposes JSON APIs that drive the frontend user dashboards:
 The application operates as an Express API hosted on Vercel's serverless infrastructure. The request lifecycle follows a strict pipeline:
 
 ```mermaid
-sequenceDiagram
-    autonumber
-    actor Client as Frontend Client
-    participant Express as Express.js Router
-    participant CORS as CORS/JSON Middleware
-    participant Auth as verifyFBToken Middleware
-    participant Firebase as Firebase Admin SDK
-    participant Handler as Route Handler
-    participant Mongo as MongoDB Atlas
-
-    Client->>Express: HTTP Request (Method + Path + Headers)
-    Express->>CORS: Pass Request
-    CORS->>CORS: Apply CORS Policies & Parse JSON Body
-    alt Route is Protected (e.g., /requests, /users)
-        CORS->>Auth: Pass to Authorization Middleware
-        Auth->>Auth: Extract Authorization Bearer Token
-        alt Token Missing or Malformed
-            Auth-->>Client: 401 Unauthorized Response
-        else Token Present
-            Auth->>Firebase: verifyIdToken(idToken)
-            alt ID Token Valid
-                Firebase-->>Auth: Decoded Token (Email, Auth Claims)
-                Auth->>Auth: Attach req.decodedEmail = Email
-                Auth->>Handler: Proceed to Handler (next())
-            else ID Token Invalid
-                Firebase-->>Auth: Verification Failure (Error)
-                Auth-->>Client: 401 Unauthorized Response
-            end
-        end
-    else Route is Public (e.g., /public-stats, /search-request)
-        CORS->>Handler: Proceed Direct to Handler
-    end
-    Handler->>Mongo: Execute Database Operations (Find, Insert, Update, Aggregate)
-    Mongo-->>Handler: Return Database Result Set
-    Handler-->>Client: 200/201/500 JSON Response Payload
+graph TD
+    A[Frontend Client] -->|HTTP Request| B(Express.js Web Server)
+    B --> C{CORS & JSON Body Parser}
+    C -->|Invalid Header/Body| D[400 Bad Request / CORS Error]
+    C -->|Valid Request| E{Is Route Protected?}
+    
+    E -->|No: Public Route| H[Route Handler]
+    E -->|Yes: Protected Route| F[verifyFBToken Middleware]
+    
+    F -->|Missing / Invalid Token| G[401/403 Unauthorized Response]
+    F -->|Valid Firebase ID Token| H
+    
+    H -->|Database Operations| I[(MongoDB Atlas Cluster)]
+    I -->|Query Results| H
+    H -->|JSON Response Payload| A
 ```
+
+### Architectural Component Breakdown
+
+1. **Client Communication Layer**: The frontend client dispatches CORS-compliant AJAX requests with optional Bearer tokens in the `Authorization` header.
+2. **Middleware & Validation Pipeline**: Parses JSON payloads, applies origin-sharing checks, and verifies client-side JWT authorization credentials using the Firebase Admin SDK.
+3. **Controller & Business Logic**: Implements transaction tracking, aggregation engines, user updates, and Stripe checkout sessions.
+4. **Data Persistence (MongoDB)**: Executes raw, index-optimized Mongo operations using the native Node driver for low-latency CRUD actions.
 
 ---
 
