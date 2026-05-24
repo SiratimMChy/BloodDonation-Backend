@@ -104,7 +104,7 @@ sequenceDiagram
             else ID Token Invalid
                 Firebase-->>Auth: Verification Failure (Error)
                 Auth-->>Client: 401 Unauthorized Response
-            }
+            end
         end
     else Route is Public (e.g., /public-stats, /search-request)
         CORS->>Handler: Proceed Direct to Handler
