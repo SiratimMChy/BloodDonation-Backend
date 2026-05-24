@@ -28,13 +28,13 @@ This repository hosts the **Core REST API Engine & Backend Infrastructure** for 
 - [Real-World Problem \& Solution](#-real-world-problem--solution)
 - [Backend Architecture Features](#-backend-architecture-features)
 - [Technical Architecture \& Request Lifecycle](#-technical-architecture--request-lifecycle)
-- [🗄️ Database Architecture \& Schemas](#️-database-architecture--schemas)
-- [🛡️ Enterprise Security Implementations](#️-enterprise-security-implementations)
-- [⚡ Performance Optimization Engineering](#-performance-optimization-engineering)
-- [📁 Modular Directory Blueprint](#-modular-directory-blueprint)
-- [⚙️ Development \& Local Installation](#️-development--local-installation)
-- [☁️ Continuous Deployment \& Vercel Cloud Execution](#️-continuous-deployment--vercel-cloud-execution)
-- [📄 License \& Maintainer](#-license--maintainer)
+- [Database Architecture \& Schemas](#️-database-architecture--schemas)
+- [ Enterprise Security Implementations](#️-enterprise-security-implementations)
+- [Performance Optimization Engineering](#-performance-optimization-engineering)
+- [Modular Directory Blueprint](#-modular-directory-blueprint)
+- [Development \& Local Installation](#️-development--local-installation)
+- [Continuous Deployment \& Vercel Cloud Execution](#️-continuous-deployment--vercel-cloud-execution)
+- [License \& Maintainer](#-license--maintainer)
 
 ---
 
