@@ -1,6 +1,6 @@
-# 🩸 Hemovia – Core REST API Gateway & Engine
+# 🩸 Hemovia – Core REST API Engine & Infrastructure
 
-Hemovia is a high-throughput, latency-optimized, and modular REST API engineered to power the **Hemovia Blood Donation & Matchmaking Platform**. The backend acts as the single source of truth for geographical donor matchmaking, transactional request orchestration, secure payment gateways, and analytical computation. 
+Hemovia is a high-throughput, latency-optimized, and modular REST API engineered to power the **Hemovia Blood Donation & Matchmaking Platform**. The backend acts as the single source of truth for geographical donor matchmaking, transactional request orchestration, secure payment gateways, and analytical computation.
 
 Developed with a clean **Modular Monolithic** design, the engine operates on **Express.js (v5)** and **MongoDB** utilizing the raw **native MongoDB node driver** (bypassing heavy ORM/ODM layers to sustain sub-100ms request lifecycles under high database load).
 
@@ -24,47 +24,61 @@ Developed with a clean **Modular Monolithic** design, the engine operates on **E
 
 ## 📋 Table of Contents
 
-- [Executive Summary \& Real-World Value](#-executive-summary--real-world-value)
-- [Production Stack \& Modern Tools](#-production-stack--modern-tools)
-- [Technical Architecture \& Request Lifecycle](#-technical-architecture--request-lifecycle)
-- [Core API Documentation](#-core-api-documentation)
-  - [👥 User Directory \& Profile Operations](#-user-directory--profile-operations)
-  - [🩸 Blood Donation Requests Orchestration](#-blood-donation-requests-orchestration)
-  - [💳 Stripe Checkout \& Ledger Gateway](#-stripe-checkout--ledger-gateway)
-- [🗄️ Database Architecture \& Schemas](#️-database-architecture--schemas)
+- [About The Project & Purpose](#-about-the-project--purpose)
+- [Real-World Problem & Solution](#-real-world-problem--solution)
+- [Backend Architecture Features](#-backend-architecture-features)
+- [Technical Architecture & Request Lifecycle](#-technical-architecture--request-lifecycle)
+- [🗄️ Database Architecture & Schemas](#️-database-architecture--schemas)
 - [🛡️ Enterprise Security Implementations](#️-enterprise-security-implementations)
 - [⚡ Performance Optimization Engineering](#-performance-optimization-engineering)
 - [📁 Modular Directory Blueprint](#-modular-directory-blueprint)
-- [⚙️ Development \& Local Installation](#️-development--local-installation)
-- [☁️ Continuous Deployment \& Vercel Cloud Execution](#️-continuous-deployment--vercel-cloud-execution)
-- [📄 License \& Maintainer](#-license--maintainer)
+- [⚙️ Development & Local Installation](#️-development--local-installation)
+- [☁️ Continuous Deployment & Vercel Cloud Execution](#️-continuous-deployment--vercel-cloud-execution)
+- [📄 License & Maintainer](#-license--maintainer)
 
 ---
 
-## 🎯 Executive Summary & Real-World Value
-*(Targeting Clients, Recruiters, and Software Companies)*
+## 🎯 About The Project & Purpose
 
-Sourcing compatible blood donors in critical emergency conditions is a time-critical bottleneck. Hemovia solves the coordination issues of matching donors, volunteers, and recipients in real-time through the following features:
+**Hemovia** is a comprehensive blood donation management platform that digitizes and accelerates every step of the donation pipeline. The backend repository houses the core RESTful API gateway, driving the matchmaking, safety checks, real-time analytics, and secure payment integrations that power the frontend application.
 
-- **Intelligent Geographic Routing**: Blazing-fast search algorithms matching blood groups, district, and upazila levels.
-- **Request Lifecycle Orchestration**: Prevents redundant messaging or coordination conflicts using a strict state machine (`pending` ➔ `inprogress` / `done` / `cancelled`).
-- **Cryptographically Secure User Access**: Integration with Firebase Identity Management guarantees zero database leakage of user passwords, offloading identity verification securely.
-- **Auditable Financial Ledger**: Integration with the Stripe Checkout API creates a verified fundraising channel with database-enforced idempotency checks, ensuring ledger consistency.
+By prioritizing efficiency, security, and low-latency data persistence, the Hemovia API represents a production-grade backend engine designed to meet modern software engineering standards.
 
 ---
 
-## 🛠️ Production Stack & Modern Tools
+## 🧠 Real-World Problem & Solution
 
-- **Core Runtime**: Node.js (v18+) & Express.js (v5)
-- **Database Persistence**: MongoDB Atlas Cluster via Raw Native MongoDB Node.js Driver (highly optimized for low-latency operations)
-- **Identity & Access Management**: Firebase Admin SDK (JWT Validation Middleware)
-- **Financial Gateway**: Stripe Checkout Platform
-- **Deployment Platform**: Vercel (Serverless Cloud Environment)
+### The Problem
+During medical emergencies (surgeries, trauma care, chronic illnesses like thalassemia), finding compatible blood donors is a critical and time-sensitive bottleneck. Traditional sourcing methods suffer from:
+
+1. **Inefficient Sourcing** — No location-based filtering means requests reach donors who are too far away.
+2. **Coordination Overhead** — No request tracking leads to duplicate volunteer signups or unanswered calls.
+3. **Transparency Issues** — No consolidated, verified ledger for financial contributions or community aid.
+
+### The Solution
+The Hemovia API gateway digitizes and orchestrates the entire donation pipeline:
+
+- **Geographic Matchmaking**: Instantly query live donor pools by blood group, district, and upazila.
+- **Request Lifecycle Management**: Tracks emergency requests through a strict state machine (`pending` ➔ `inprogress` ➔ `done` / `canceled`) to prevent volunteer duplication.
+- **Financial Ledger Transparency**: Directly interfaces with Stripe Checkout to maintain a verified, database-indexed, and publicly auditable ledger of all community funding.
+
+---
+
+## ✨ Backend Architecture Features
+
+The Express API gateway exposes highly optimized endpoints that drive the frontend dashboards and core application services:
+
+- **Role-Based Routing (RBAC)**: Dynamically handles security verification and user access policies based on database-defined roles (`donor`, `volunteer`, `admin`).
+- **Interactive Query Engine**: Backs the multi-field donor search engine with fast, indexable fields matching blood type and location parameters.
+- **Aggregate Analytics Hub**: Compiles real-time system stats (total lives saved, target blood group deficits, donor counts, and emergency case distributions) via database aggregates rather than application memory.
+- **Demo Mode Safety (Read-Only Guard)**: Identifies demo accounts (`donor@hemovia.com`, `admin@hemovia.com`) at the middleware layer to block state mutations while permitting unrestricted read actions.
+- **Regex Clinical Diagnostics**: Automatically classifies clinical emergency states versus general procedures by running regex analysis directly within the database index.
 
 ---
 
 ## 🏗️ Technical Architecture & Request Lifecycle
-The API follows a decoupled controller-service-repository pattern using native routes and configurations.
+
+The application operates as a decoupled MVC-style monolithic gateway hosted on Vercel's serverless infrastructure. The request lifecycle follows a strict pipeline:
 
 ```mermaid
 graph TD
@@ -91,91 +105,16 @@ graph TD
     Output --> Client
 ```
 
-### Design Highlights:
-1. **Middleware & Validation Pipeline**: Parses JSON payloads, applies origin-sharing checks, and verifies client-side JWT authorization credentials using the Firebase Admin SDK.
-2. **Persistence Strategy**: Utilizes a single database client connection pool instantiated in `config/db.js` and distributed across modules. Direct collection exports prevent the overhead of ORMs like Mongoose, yielding a 3-5x latency reduction.
-3. **Serverless Scaling**: Standardized under `vercel.json` to leverage Serverless Functions, ensuring instant horizontal scaling under heavy traffic.
-
----
-
-## 🔌 Core API Documentation
-*(Designed for Backend Engineers & Technical Evaluators)*
-
-All endpoints expect and return JSON payloads. Relative routes are prefix-free (handled by the Express router).
-
-### 👥 User Directory & Profile Operations
-
-*   **`POST /users`**
-    *   **Description**: Registers a new user/donor onto the platform. Sets defaults: `role: 'donor'`, `status: 'active'`.
-    *   **Request Body**:
-        ```json
-        {
-          "name": "Jane Doe",
-          "email": "janedoe@example.com",
-          "imageUrl": "https://example.com/avatar.jpg",
-          "bloodGroup": "O+",
-          "district": "Dhaka",
-          "upazila": "Mirpur"
-        }
-        ```
-*   **`GET /users`** *(Protected: Requiring Bearer Token)*
-    *   **Description**: Paginated list of all system users.
-    *   **Query Parameters**: `size` (default: 10), `page` (default: 0).
-    *   **Response**: `{ totalUsers: 142, users: [...] }`
-*   **`GET /users/role/:email`**
-    *   **Description**: Fetches detailed profile and platform roles associated with an email.
-*   **`PATCH /update/user/status`** *(Protected)*
-    *   **Query Params**: `email`, `status` (`active` | `blocked`).
-*   **`PATCH /update/user/role`** *(Protected)*
-    *   **Query Params**: `email`, `role` (`donor` | `volunteer` | `admin`).
-*   **`PATCH /users/update/profile`** *(Protected)*
-    *   **Description**: Updates profile details for the currently authenticated caller (retrieved from JWT payload).
-*   **`GET /demo-users`**
-    *   **Description**: Public sandbox users (`donor@hemovia.com`, `admin@hemovia.com`) for trial access.
-
-### 🩸 Blood Donation Requests Orchestration
-
-*   **`POST /requests`** *(Protected)*
-    *   **Description**: Publishes a new blood donation campaign request.
-*   **`GET /requests`** *(Protected)*
-    *   **Description**: Paginated request management list for dashboard review. Supports status filtering: `all`, `pending`, `inprogress`, `done`.
-*   **`GET /my-recent-requests`** *(Protected)*
-    *   **Description**: Retrieves the top 3 most recent requests authored by the authenticated caller.
-*   **`GET /myrequests`** *(Protected)*
-    *   **Description**: Paginated lists of requests authored by the caller.
-*   **`GET /requests/:id`** *(Protected)*
-    *   **Description**: Fetches a single donation campaign by ObjectId.
-*   **`PUT /requests/:id`** *(Protected)*
-    *   **Description**: Updates fields of a specific donation query.
-*   **`DELETE /delete-request/:id`**
-    *   **Description**: Deletes a donation query by ObjectId.
-*   **`GET /public-requests`**
-    *   **Description**: Public listing of active campaigns for anonymous portal display. Paginated.
-*   **`GET /search-request`**
-    *   **Description**: Dynamic geo-matching query.
-    *   **Query Parameters**: `bloodGroup`, `district`, `upazila` (Optional filters).
-    *   **Response**: List of compatible donors/requests matching geographical targets.
-*   **`GET /public-stats`**
-    *   **Description**: Anonymous stats engine computing active donors, donation rate success, and remaining target blood group demands using aggregation pipelines.
-*   **`GET /request-message-stats`**
-    *   **Description**: Regex-based analytics classifying clinical emergency states versus general hospital procedures from request messages.
-
-### 💳 Stripe Checkout & Ledger Gateway
-
-*   **`POST /create-payment-checkout`**
-    *   **Description**: Spawns an external Stripe Checkout Session URL for verified contributions.
-    *   **Request Body**: `{ donateAmount: 50, donorName: "Jane Doe", donorEmail: "janedoe@example.com" }`
-    *   **Response**: `{ url: "https://checkout.stripe.com/..." }`
-*   **`POST /payment-success`**
-    *   **Description**: Stripe webhook callback endpoint checking and finalizing transactions.
-    *   **Security**: Double-checks transaction status with Stripe server-side using session IDs and prevents duplicate database entries.
-*   **`GET /payment`** *(Protected)*
-    *   **Description**: Paginated financial ledger of verified donations, sorted chronologically descending.
+### Architectural Component Breakdown:
+1. **Client Communication Layer**: The frontend client dispatches CORS-compliant requests injecting Firebase ID tokens into the `Authorization` header.
+2. **Middleware & Validation Pipeline**: Parses JSON payloads, applies origin-sharing policies, and verifies client JWT credentials securely via the Firebase Admin SDK.
+3. **Controller & Business Logic**: Separated cleanly into routing files, managing state machines, search queries, payment sessions, and analytical computation.
+4. **Data Persistence**: Utilizes a single, shared connection pool directly exported by `config/db.js`. Raw MongoDB driver operations bypass heavy ODM layers (like Mongoose), reducing execution overhead by 3-5x.
 
 ---
 
 ## 🗄️ Database Architecture & Schemas
-The database runs on MongoDB Atlas under the DB namespace `bloodDonationDB`. The primary collections include:
+The database runs on MongoDB Atlas under the database namespace `bloodDonationDB`. The primary collections and their document schemas include:
 
 ### 1. `users` Collection
 Stores user profiles, roles, and administrative statuses.
@@ -224,7 +163,7 @@ Stores records of financial contributions processed via Stripe checkout.
   "donorName": "string",
   "donorEmail": "string",
   "amount": "number (Decimal in USD)",
-  "currency": "string",
+  "currency": "string (e.g., 'usd')",
   "transactionId": "string (Unique Stripe Payment Intent ID)",
   "payment_status": "string (e.g., 'paid')",
   "paidAt": "ISODate"
@@ -280,8 +219,8 @@ hemovia-backend/
 
 ### 1. Project Initialization
 ```bash
-git clone <repository_url>
-cd hemovia-backend
+git clone https://github.com/SiratimMChy/BloodDonation-Backend.git
+cd BloodDonation-Backend
 npm install
 ```
 
@@ -309,7 +248,7 @@ DB_PASS=your_db_password
 ```bash
 npm start
 ```
-Starts the engine on `http://localhost:5000`.
+Starts the engine locally on `http://localhost:5000`.
 
 ---
 
@@ -320,7 +259,7 @@ This application is configured for serverless production deployments on **Vercel
 npm install -g vercel
 vercel --prod
 ```
-The `vercel.json` file automatically directs all requests to the serverless entrypoint `index.js`. Ensure your hosting provider dashboard has all `.env` secrets mapped correctly.
+The `vercel.json` file automatically directs all incoming requests to the serverless entrypoint `index.js`. Ensure your hosting provider dashboard has all `.env` secrets mapped correctly.
 
 ---
 
@@ -332,10 +271,12 @@ Distributed under the **ISC License**.
 
 <div align="center">
 
-**Crafted with Professional Rigor by Siratim Mustakim Chowdhury**
+**Made with ❤️ by Siratim Mustakim Chowdhury**
 
 [![GitHub](https://img.shields.io/badge/GitHub-SiratimMChy-181717?style=flat&logo=github)](https://github.com/SiratimMChy)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Siratim%20Mustakim-0077B5?style=flat&logo=linkedin)](https://www.linkedin.com/in/siratim-mustakim-chowdhury/)
 [![Email](https://img.shields.io/badge/Email-chowdhurysiratimmustakim@gmail.com-D14836?style=flat&logo=gmail&logoColor=white)](mailto:chowdhurysiratimmustakim@gmail.com)
+
+⭐ Star this repository if you find it helpful!
 
 </div>
