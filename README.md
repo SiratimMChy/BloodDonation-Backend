@@ -12,7 +12,7 @@ This repository hosts the **Core REST API Engine & Backend Infrastructure** for 
 [![Firebase Admin](https://img.shields.io/badge/Firebase-Admin%20SDK-FFCA28?style=flat&logo=firebase&logoColor=black)](https://firebase.google.com/)
 [![Stripe SDK](https://img.shields.io/badge/Stripe-v20.1-008FC7?style=flat&logo=stripe&logoColor=white)](https://stripe.com/)
 [![Vercel Deployment](https://img.shields.io/badge/Vercel-Serverless-000000?style=flat&logo=vercel&logoColor=white)](https://vercel.com/)
-[![License](https://img.shields.io/badge/License-Proprietary-orange?style=flat)](#license)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](#license-&-contributions)
 
 <a href="https://blooddonation-f6367.web.app" target="_blank">
   <img src="https://img.shields.io/badge/HEMOVIA-LIVE%20DEMO-dc2626?style=for-the-badge&logo=firefox-browser&logoColor=white&labelColor=111827" alt="Live Demo" />
@@ -34,7 +34,7 @@ This repository hosts the **Core REST API Engine & Backend Infrastructure** for 
 - [Modular Directory Blueprint](#-modular-directory-blueprint)
 - [Development \& Local Installation](#️-development--local-installation)
 - [Continuous Deployment \& Vercel Cloud Execution](#️-continuous-deployment--vercel-cloud-execution)
-- [License \& Maintainer](#-license--maintainer)
+- [License & Contributions](#-license--contributions)
 
 ---
 
@@ -270,9 +270,11 @@ The `vercel.json` file automatically directs all incoming requests to the server
 
 ---
 
-## 📄 License & Maintainer
+## 📄 License & Contributions
 
-This software and its documentation are **proprietary and confidential**. Unauthorized copying, distribution, modification, or public deployment of this system via any medium is strictly prohibited.
+This project is open-source and welcoming. Anyone is free to view, explore, and contribute to this repository. However, proper credit and attribution must be given to the original creator.
+
+Distributed under the **MIT License**. See the license details for more information.
 
 *Copyright © 2026 Hemovia Management Platform. All rights reserved.*
 
