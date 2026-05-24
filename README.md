@@ -272,18 +272,16 @@ The `vercel.json` file automatically directs all incoming requests to the server
 
 ## 📄 License & Maintainer
 
-Distributed under the **ISC License**.
+This software and its documentation are **proprietary and confidential**. Unauthorized copying, distribution, modification, or public deployment of this system via any medium is strictly prohibited.
 
-*Copyright © 2026 Hemovia. All rights reserved.*
+*Copyright © 2026 Hemovia Management Platform. All rights reserved.*
 
 <div align="center">
 
-**Made with ❤️ by Siratim Mustakim Chowdhury**
+**Made by Siratim Mustakim Chowdhury**
 
 [![GitHub](https://img.shields.io/badge/GitHub-SiratimMChy-181717?style=flat&logo=github)](https://github.com/SiratimMChy)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Siratim%20Mustakim-0077B5?style=flat&logo=linkedin)](https://www.linkedin.com/in/siratim-mustakim-chowdhury/)
 [![Email](https://img.shields.io/badge/Email-chowdhurysiratimmustakim@gmail.com-D14836?style=flat&logo=gmail&logoColor=white)](mailto:chowdhurysiratimmustakim@gmail.com)
-
-⭐ Star this repository if you find it helpful!
 
 </div>
