@@ -211,22 +211,6 @@ DB_USER=your_db_username
 DB_PASS=your_db_password
 ```
 
-### Firebase Key Encoding (Configuration Management)
-To bypass challenges uploading service account credential files to hosted platforms (like Vercel or Netlify), the backend utilizes a Base64 configuration strategy. 
-
-The [keyConverter.js](file:///c:/Projects/Blood%20Donation%20-%20Backend/keyConverter.js) utility reads your downloaded private Firebase credentials file, base64 encodes it, and prints it:
-```javascript
-const fs = require('fs');
-const key = fs.readFileSync('./blooddonation.json', 'utf8')
-const base64 = Buffer.from(key).toString('base64')
-console.log(base64)
-```
-Paste this output string into the `FB_SERVICE_KEY` environment variable. The backend automatically decodes and parses this string during bootstrap:
-```javascript
-const decoded = Buffer.from(process.env.FB_SERVICE_KEY, 'base64').toString('utf8');
-const serviceAccount = JSON.parse(decoded);
-```
-
 ---
 
 ## ⚡ Performance & Scalability Optimization
@@ -249,10 +233,8 @@ const serviceAccount = JSON.parse(decoded);
 The backend repository maintains a flat, efficient layout optimized for serverless performance on Vercel:
 
 *   [index.js](file:///c:/Projects/Blood%20Donation%20-%20Backend/index.js): Main application entry point containing database connections, middleware definitions, route declarations, and business logic.
-*   [keyConverter.js](file:///c:/Projects/Blood%20Donation%20-%20Backend/keyConverter.js): Utility script used to encode the Firebase Service Account JSON credentials into a base64 string for secure environment variable injection.
 *   [vercel.json](file:///c:/Projects/Blood%20Donation%20-%20Backend/vercel.json): Vercel platform configurations specifying Node.js runtime bindings (`@vercel/node`) and API routing rules.
 *   [package.json](file:///c:/Projects/Blood%20Donation%20-%20Backend/package.json): Defines dependencies, project metadata, and entry commands.
-*   [blooddonation.json](file:///c:/Projects/Blood%20Donation%20-%20Backend/blooddonation.json): Local Firebase credentials file (git-ignored in production, used as input for [keyConverter.js](file:///c:/Projects/Blood%20Donation%20-%20Backend/keyConverter.js)).
 
 ---
 
