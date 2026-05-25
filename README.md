@@ -1,4 +1,4 @@
-# 🩸 Hemovia – Blood Donation Management Platform
+# 🩸 Hemovia - Blood Donation Management Platform
 
 **Hemovia** is a modern, full-stack platform designed to connect blood donors, volunteers, and administrators to save lives faster. By digitalizing the entire donation pipeline, it ensures that when emergency blood requests arise, compatible donors are located and coordinated instantly.
 
